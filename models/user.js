@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
-const {schema} = mongoose;
-const bycrypt = required('bycrypt');
-const userSchema = new schema({
+const {Schema} = mongoose;
+const bcrypt = require('bcrypt');
+const userSchema = new Schema({
     firstNmae:String,
     lastName:String,
     username:{type:String,required:true},
