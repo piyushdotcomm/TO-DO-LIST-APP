@@ -11,7 +11,7 @@ const userSchema = new schema({
 
 userSchema.pre("save",async function(next){
     const user = this;
-    if(!user.isModified) return next();
+    if(!user.isModified('password')) return next();
     let salt = await bycrypt.genSalt(10);
     let hash = await bycrypt.hash(user.password,salt);
     user.password = hash;
