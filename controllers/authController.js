@@ -1,6 +1,8 @@
 const User = require('../models/user');
+const jwt = require('jsonwebtoken')
+require('dotenv').config();
 
-
+const secretKey = process.env.JWT_SECRET;
 
 async function registerUser(req,res){
     let {firstName,lastNmae,username,password} = req.body;
@@ -21,7 +23,32 @@ async function registerUser(req,res){
 
 }
 
+async function loginUser(req,res){
+    try {
+        const {username,password} = req.body;
+        const user = await User.findOne({username});
+        if(!user){
+            return res.status(404).send({error:"Authentication Failed!"});
+        }
+        const isPasswordValid = await user.comparePassword(password);
+        if(!isPasswordValid){
+            return res.status(404).send({error:"wrong password"});
+        }
+        let token = jwt.sign({userId:user?._id},secretKey,{expiresIn:'1h'});
+        let finalData = {
+            userId:user?._id,
+            username:user?.username,
+            firstName:user?.firstNmae,
+            lastName:user?.lastName,
+            token
+        }
+        res.send(finalData);
+    } catch (err) {
+        console.log(err);
+        res.status(400).send({message:err})
+    }
 
+}
 const AuthController = {
     registerUser
 }
