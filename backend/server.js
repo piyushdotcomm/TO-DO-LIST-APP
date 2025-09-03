@@ -12,7 +12,10 @@ const MONGO_URI = process.env.DB_URL;  // 👈 make sure your .env has DB_URL=..
 
 // Middleware
 app.use(cors({
-  origin: "http://localhost:3000",  // allow only frontend
+  origin: [
+    "http://localhost:3000",                   // for local development
+    "https://to-do-list-app-nu-weld.vercel.app" // for deployed frontend
+  ],
   methods: ["GET", "POST", "PUT","PATCH", "DELETE"],
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"]
