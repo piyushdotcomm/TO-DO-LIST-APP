@@ -1,32 +1,42 @@
 const mongoose = require('mongoose');
-const {Schema} = mongoose;
-const bcrypt = require('bcrypt');
-const userSchema = new Schema({
-    firstName:String,
-    lastName:String,
-    username:{type:String,required:true},
-    password:{type:String,required:true}
+const bcrypt = require('bcryptjs'); // Make sure to install bcryptjs: npm install bcryptjs
+
+const userSchema = new mongoose.Schema({
+    firstName: {
+        type: String,
+        required: true,
+    },
+    lastName: {
+        type: String,
+        required: true,
+    },
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    password: {
+        type: String,
+        required: true,
+    },
 });
 
+// ✅ PRE-SAVE HOOK: Hash password before saving
+userSchema.pre('save', async function (next) {
+    // Only hash the password if it has been modified (or is new)
+    if (!this.isModified('password')) {
+        return next();
+    }
 
-userSchema.pre("save",async function(next){
-    const user = this;
-    if(!user.isModified('password')) return next();
-    let salt = await bcrypt.genSalt(10);
-    let hash = await bcrypt.hash(user.password,salt);
-    user.password = hash;
+    // Generate a salt and hash the password
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
     next();
 });
 
+// ✅ METHOD TO COMPARE PASSWORD FOR LOGIN
+userSchema.methods.comparePassword = function (candidatePassword) {
+    return bcrypt.compare(candidatePassword, this.password);
+};
 
-userSchema.methods.comparePassword = async function (password){
-    return bcrypt.compare(password,this.password);
-}
-
-
-
-
-const User = mongoose.model("User",userSchema);
-
-
-module.exports = User;
+module.exports = mongoose.model('User', userSchema);
