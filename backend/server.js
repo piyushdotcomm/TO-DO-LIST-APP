@@ -3,7 +3,7 @@ const app = express();
 const cors = require('cors');
 const mongoose = require('mongoose');
 const authRoutes = require('./routes/authRoutes');
-const toDoRoutes = require('./routes/toDoRoutes');
+const toDoRoutes = require('./routes/ToDoRoutes');
 
 require('dotenv').config();
 
